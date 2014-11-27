@@ -1,14 +1,15 @@
-﻿using System;
+﻿using Autofac;
+using System;
 
 namespace CQRSApplication.Commands
 {
     public class CommandBus : ICommandBus
     {
-        private readonly Func<Type, IHandleCommand> _handlersFactory;
+        private readonly IComponentContext _context;
 
-        public CommandBus(Func<Type, IHandleCommand> handlersFactory)
+        public CommandBus(IComponentContext context)
         {
-            _handlersFactory = handlersFactory;
+            _context = context;
         }
 
         public void SendCommand<T>(T cmd) where T : ICommand
@@ -20,7 +21,9 @@ namespace CQRSApplication.Commands
             // pomiar czasu
             // error handling
 
-            var handler = (IHandleCommand<T>)_handlersFactory(typeof(T));
+            Console.WriteLine(new string('-', 45));
+
+            var handler = _context.Resolve<Commands.IHandleCommand<T>>();
             handler.Handle(cmd);
         }
     }

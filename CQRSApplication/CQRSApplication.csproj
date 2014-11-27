@@ -48,6 +48,7 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandBus.cs" />
     <Compile Include="Commands\IHandleCommand.cs" />
+    <Compile Include="Commands\UtworzKontrahenta.cs" />
     <Compile Include="Commands\UtworzZamowienie.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
