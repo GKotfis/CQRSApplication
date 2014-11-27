@@ -1,24 +1,59 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Autofac;
+using CQRSApplication.Commands;
+using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CQRSApplication
 {
     class Program
     {
+        static IContainer container;
+        static ICommandBus commandBus;
+
         static void Main(string[] args)
         {
-            // Bezpośrednie wywołanie handler'a
-            Commands.UtworzZamowienieHandler commandHandler = new Commands.UtworzZamowienieHandler();
-            commandHandler.Handle(new Commands.UtworzZamowienie { Kontrahent = "Test", Data = DateTime.Now});
+            
+            ConfigureIoC();
+            commandBus = container.Resolve<ICommandBus>();
 
-           // Jak stworzyć instancję ICommandBus nie korzystając z IoC?
-            Commands.ICommandBus commandBus = new Commands.CommandBus(null);
-            commandBus.SendCommand(new Commands.UtworzZamowienie { Kontrahent = "JanKowalski", Data = DateTime.Now });
+            //commandBus = new CommandBus(GetHandler_factory());
+            
+            commandBus.SendCommand<UtworzZamowienieCommand>(new UtworzZamowienieCommand { Kontrahent = "JanKowalski", Data = DateTime.Now });
 
             Console.ReadKey();
+        }
+
+        static void ConfigureIoC()
+        {
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterType<Commands.CommandBus>()
+                            .As<Commands.ICommandBus>()
+                            .InstancePerLifetimeScope();
+                            
+
+            containerBuilder.RegisterAssemblyTypes().AsClosedTypesOf(typeof(IHandleCommand<>));
+
+            container = containerBuilder.Build();
+
+        }
+
+        private static Func<Type, IHandleCommand> GetHandler_factory()
+        {
+            var all_types = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes());
+
+            var command_handlers = all_types
+                .Where(x => typeof(IHandleCommand<>).IsAssignableFrom(x));
+
+            Func<Type, IHandleCommand> handler_factory = t =>
+            {
+                Type handler_type = command_handlers
+                    .Single(x => x.GetGenericArguments()[0] == t);
+
+                return (IHandleCommand)Activator.CreateInstance(handler_type);
+            };
+
+            return handler_factory;
         }
     }
 }
