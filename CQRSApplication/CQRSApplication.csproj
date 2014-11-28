@@ -50,6 +50,11 @@
     <Compile Include="Commands\IHandleCommand.cs" />
     <Compile Include="Commands\UtworzKontrahenta.cs" />
     <Compile Include="Commands\UtworzZamowienie.cs" />
+    <Compile Include="Events\EventsBus.cs" />
+    <Compile Include="Events\IEvent.cs" />
+    <Compile Include="Events\IEventsBus.cs" />
+    <Compile Include="Events\IHandleEvent.cs" />
+    <Compile Include="Events\ZamowienieUtworzone.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
