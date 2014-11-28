@@ -34,16 +34,14 @@ namespace CQRSApplication
             var assembly = Assembly.GetExecutingAssembly();
             containerBuilder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(IHandleCommand<>));
 
-            // Coś nie tak z rejestracją :/
-            // Rejestrujemy Func<Type, IHandleCommand> czy Func<Type, IHandleCommand<ICommand>> ?
-
             containerBuilder.Register<Func<Type, IHandleCommand>>(c =>
                             {
                                 var context = c.Resolve<IComponentContext>();
 
                                 return commandType =>
                                 {
-                                    return context.Resolve<Commands.IHandleCommand<commandType>>();
+                                    Type handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
+                                    return (IHandleCommand)context.Resolve(handlerType);                                    
                                 };
                             });
 
