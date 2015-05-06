@@ -15,7 +15,6 @@ namespace CQRSApplication.Events
     public class WhenZamowienieUtworzone : IHandleEvent<ZamowienieUtworzone>
     {
 
-
         public void Handle(ZamowienieUtworzone @event)
         {
             Console.WriteLine("[Handler] Utworzono zamówienie. Id: {0}, Symbol: {1}", @event.GIDNumer, @event.Symbol);

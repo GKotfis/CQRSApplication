@@ -24,9 +24,9 @@ namespace CQRSApplication.Commands
         {
             Console.WriteLine("Tworzenie zamówienia Kontrahent: {0}, Data: {1} ", command.Kontrahent, command.Data);
             System.Threading.Thread.Sleep(1500);
-            Console.WriteLine("Dokument został utworzony ...");
+            Console.WriteLine("Dokument został utworzony. Publikowanie zdarzeń");
 
-            _eventsBus.PublishEvent <ZamowienieUtworzone>(new ZamowienieUtworzone { GIDNumer = 1234, Symbol = "ZS-1234/2013" });
+            _eventsBus.PublishEvent<ZamowienieUtworzone>(new ZamowienieUtworzone { GIDNumer = 1234, Symbol = "ZS-1234/2013" });
         }
     }
 }

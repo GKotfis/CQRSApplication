@@ -1,21 +1,18 @@
 ﻿using Autofac;
 using CQRSApplication.Commands;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace CQRSApplication
 {
-    class Program
+    internal class Program
     {
-        static IContainer _container;
-        static ICommandBus _commandBus;
+        private static IContainer _container;
+        private static ICommandBus _commandBus;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
-
             ConfigureIoC();
 
             _commandBus = _container.Resolve<ICommandBus>();
@@ -26,10 +23,9 @@ namespace CQRSApplication
             Console.ReadKey();
         }
 
-        static void ConfigureIoC()
+        private static void ConfigureIoC()
         {
             var containerBuilder = new ContainerBuilder();
-
 
             // CommandsBus
             containerBuilder.RegisterType<Commands.CommandBus>()
@@ -45,11 +41,10 @@ namespace CQRSApplication
                                 return commandType =>
                                 {
                                     Type handlerType = typeof(IHandleCommand<>).MakeGenericType(commandType);
-                                    return (IHandleCommand)context.Resolve(handlerType);                                    
+                                    return (IHandleCommand)context.Resolve(handlerType);
                                 };
                             });
 
-           
             // EventsBus
             containerBuilder.RegisterType<Events.EventsBus>().As<Events.IEventsBus>();
             containerBuilder.RegisterAssemblyTypes(assembly).AsClosedTypesOf(typeof(Events.IHandleEvent<>));
@@ -58,20 +53,20 @@ namespace CQRSApplication
                 {
                     var context = c.Resolve<IComponentContext>();
 
-                    //ICollection<Events.IHandleEvent> handlers = new List<Events.IHandleEvent>();
-                    
                     return eventType =>
                         {
                             Type handlerType = typeof(Events.IHandleEvent<>).MakeGenericType(eventType);
-                            
-                            return (IEnumerable<Events.IHandleEvent>)context.Resolve(handlerType);
+                            Type handlersType = typeof(IEnumerable<>).MakeGenericType(handlerType);
 
-                            
+                            var handlersCollection = context.Resolve(handlersType);
+
+                            return (IEnumerable<Events.IHandleEvent>)handlersCollection;
                         };
                 });
 
             _container = containerBuilder.Build();
-
         }
     }
 }
+
+;
