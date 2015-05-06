@@ -1,0 +1,2 @@
+# CQRSApplication
+Simple CQRS Infrastructure
